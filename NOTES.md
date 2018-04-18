@@ -8,7 +8,7 @@ az group create --name lb-test --location canadacentral
 
 # Create a lodbalancer in created resource group
 
-az network lb create --resource-group lb-test --name reflex-lb
+az network lb create --resource-group lb-test --name rx-lb
 
 ##NOTE: Some defaults were created when the lb was creted
 
@@ -18,8 +18,8 @@ az network lb create --resource-group lb-test --name reflex-lb
     "backendAddressPools": [
       {
         "etag": "W/\"c64053ea-f293-4359-a3bf-4b1136ddc08f\"",
-        "id": "/subscriptions/fb6ad26a-aa88-4d30-9c15-2fefd4fb3d5a/resourceGroups/lb-test/providers/Microsoft.Network/loadBalancers/reflex-lb/backendAddressPools/reflex-lbbepool",
-        "name": "reflex-lbbepool",
+        "id": "/subscriptions/fb6ad26a-aa88-4d30-9c15-2fefd4fb3d5a/resourceGroups/lb-test/providers/Microsoft.Network/loadBalancers/rx-lb/backendAddressPools/rx-lbbepool",
+        "name": "rx-lbbepool",
         "properties": {
           "provisioningState": "Succeeded"
         },
@@ -29,13 +29,13 @@ az network lb create --resource-group lb-test --name reflex-lb
     "frontendIPConfigurations": [
       {
         "etag": "W/\"c64053ea-f293-4359-a3bf-4b1136ddc08f\"",
-        "id": "/subscriptions/fb6ad26a-aa88-4d30-9c15-2fefd4fb3d5a/resourceGroups/lb-test/providers/Microsoft.Network/loadBalancers/reflex-lb/frontendIPConfigurations/LoadBalancerFrontEnd",
+        "id": "/subscriptions/fb6ad26a-aa88-4d30-9c15-2fefd4fb3d5a/resourceGroups/lb-test/providers/Microsoft.Network/loadBalancers/rx-lb/frontendIPConfigurations/LoadBalancerFrontEnd",
         "name": "LoadBalancerFrontEnd",
         "properties": {
           "privateIPAllocationMethod": "Dynamic",
           "provisioningState": "Succeeded",
           "publicIPAddress": {
-            "id": "/subscriptions/fb6ad26a-aa88-4d30-9c15-2fefd4fb3d5a/resourceGroups/lb-test/providers/Microsoft.Network/publicIPAddresses/PublicIPreflex-lb",
+            "id": "/subscriptions/fb6ad26a-aa88-4d30-9c15-2fefd4fb3d5a/resourceGroups/lb-test/providers/Microsoft.Network/publicIPAddresses/PublicIPrx-lb",
             "resourceGroup": "lb-test"
           }
         },
@@ -58,7 +58,7 @@ az network lb create --resource-group lb-test --name reflex-lb
 
 az network lb frontend-ip create \
       --resource-group lb-test \
-      --lb-name reflex-lb \
+      --lb-name rx-lb \
       --name lb-ip \
       --private-ip-address 10.0.0.7 \
       --subnet-name nrpvnetsubnet \
@@ -68,14 +68,14 @@ az network lb frontend-ip create \
 
 az network lb address-pool create \
      --resource-group lb-test \
-     --lb-name reflex-lb \
+     --lb-name rx-lb \
      --name backend-pool
 
 # Create loadbalancer rules - one for every rule !! (tested: OK)
 
 az network lb rule create  \
   --resource-group lb-test \
-  --lb-name reflex-lb \
+  --lb-name rx-lb \
   --name HTTP_80 \
   --protocol tcp \
   --frontend-port 80 \
@@ -86,7 +86,7 @@ az network lb rule create  \
 
 az network lb probe create \
   --resource-group lb-test \
-  --lb-name reflex-lb \
+  --lb-name rx-lb \
   --name HTTP_80_PROBE \
   --port 80 \
   --protocol tcp \
@@ -95,7 +95,7 @@ az network lb probe create \
 # Link Probe to rule  ( this could have ben done in the creation of the rule IF the probe was created before)
 az network lb rule update \
   --resource-group lb-test \
-  --lb-name reflex-lb \
+  --lb-name rx-lb \
   --name HTTP_80 \
   --probe-name HTTP_80_PROBE
 
@@ -113,7 +113,7 @@ az network nic create \
 
 ### TRY2
 
-az network lb create --resource-group lb-test --name reflex-lb
+az network lb create --resource-group lb-test --name rx-lb
 
 ```
 {
@@ -121,8 +121,8 @@ az network lb create --resource-group lb-test --name reflex-lb
     "backendAddressPools": [
       {
         "etag": "W/\"ba4747b8-99dc-48d0-97f7-07dfa526bbdf\"",
-        "id": "/subscriptions/fb6ad26a-aa88-4d30-9c15-2fefd4fb3d5a/resourceGroups/lb-test/providers/Microsoft.Network/loadBalancers/reflex-lb/backendAddressPools/reflex-lbbepool",
-        "name": "reflex-lbbepool",
+        "id": "/subscriptions/fb6ad26a-aa88-4d30-9c15-2fefd4fb3d5a/resourceGroups/lb-test/providers/Microsoft.Network/loadBalancers/rx-lb/backendAddressPools/rx-lbbepool",
+        "name": "rx-lbbepool",
         "properties": {
           "provisioningState": "Succeeded"
         },
@@ -132,13 +132,13 @@ az network lb create --resource-group lb-test --name reflex-lb
     "frontendIPConfigurations": [
       {
         "etag": "W/\"ba4747b8-99dc-48d0-97f7-07dfa526bbdf\"",
-        "id": "/subscriptions/fb6ad26a-aa88-4d30-9c15-2fefd4fb3d5a/resourceGroups/lb-test/providers/Microsoft.Network/loadBalancers/reflex-lb/frontendIPConfigurations/LoadBalancerFrontEnd",
+        "id": "/subscriptions/fb6ad26a-aa88-4d30-9c15-2fefd4fb3d5a/resourceGroups/lb-test/providers/Microsoft.Network/loadBalancers/rx-lb/frontendIPConfigurations/LoadBalancerFrontEnd",
         "name": "LoadBalancerFrontEnd",
         "properties": {
           "privateIPAllocationMethod": "Dynamic",
           "provisioningState": "Succeeded",
           "publicIPAddress": {
-            "id": "/subscriptions/fb6ad26a-aa88-4d30-9c15-2fefd4fb3d5a/resourceGroups/lb-test/providers/Microsoft.Network/publicIPAddresses/PublicIPreflex-lb",
+            "id": "/subscriptions/fb6ad26a-aa88-4d30-9c15-2fefd4fb3d5a/resourceGroups/lb-test/providers/Microsoft.Network/publicIPAddresses/PublicIPrx-lb",
             "resourceGroup": "lb-test"
           }
         },
@@ -158,17 +158,17 @@ az network lb create --resource-group lb-test --name reflex-lb
 
 az network lb rule create  \
   --resource-group lb-test \
-  --lb-name reflex-lb \
+  --lb-name rx-lb \
   --name HTTP_80 \
   --protocol tcp \
   --frontend-port 80 \
   --backend-port 80 \
-  --backend-pool-name reflex-lbbepool
+  --backend-pool-name rx-lbbepool
 
 ```
 {
   "backendAddressPool": {
-    "id": "/subscriptions/fb6ad26a-aa88-4d30-9c15-2fefd4fb3d5a/resourceGroups/lb-test/providers/Microsoft.Network/loadBalancers/reflex-lb/backendAddressPools/reflex-lbbepool",
+    "id": "/subscriptions/fb6ad26a-aa88-4d30-9c15-2fefd4fb3d5a/resourceGroups/lb-test/providers/Microsoft.Network/loadBalancers/rx-lb/backendAddressPools/rx-lbbepool",
     "resourceGroup": "lb-test"
   },
   "backendPort": 80,
@@ -176,11 +176,11 @@ az network lb rule create  \
   "enableFloatingIp": false,
   "etag": "W/\"12d33533-721b-48de-9ede-d5857c003493\"",
   "frontendIpConfiguration": {
-    "id": "/subscriptions/fb6ad26a-aa88-4d30-9c15-2fefd4fb3d5a/resourceGroups/lb-test/providers/Microsoft.Network/loadBalancers/reflex-lb/frontendIPConfigurations/LoadBalancerFrontEnd",
+    "id": "/subscriptions/fb6ad26a-aa88-4d30-9c15-2fefd4fb3d5a/resourceGroups/lb-test/providers/Microsoft.Network/loadBalancers/rx-lb/frontendIPConfigurations/LoadBalancerFrontEnd",
     "resourceGroup": "lb-test"
   },
   "frontendPort": 80,
-  "id": "/subscriptions/fb6ad26a-aa88-4d30-9c15-2fefd4fb3d5a/resourceGroups/lb-test/providers/Microsoft.Network/loadBalancers/reflex-lb/loadBalancingRules/HTTP_80",
+  "id": "/subscriptions/fb6ad26a-aa88-4d30-9c15-2fefd4fb3d5a/resourceGroups/lb-test/providers/Microsoft.Network/loadBalancers/rx-lb/loadBalancingRules/HTTP_80",
   "idleTimeoutInMinutes": 4,
   "loadDistribution": "Default",
   "name": "HTTP_80",
@@ -191,6 +191,6 @@ az network lb rule create  \
 }
 ```
 
-az network nic ip-config  address-pool add --address-pool reflex-lbbepool --lb-name reflex-lb --resource-group lb-test --nic-name vm-2180 --ip-config-name ipconfig1
+az network nic ip-config  address-pool add --address-pool rx-lbbepool --lb-name rx-lb --resource-group lb-test --nic-name vm-2180 --ip-config-name ipconfig1
 
-az network nic ip-config  address-pool add --address-pool reflex-lbbepool --lb-name reflex-lb --resource-group lb-test --nic-name vm-1784 --ip-config-name ipconfig1
+az network nic ip-config  address-pool add --address-pool rx-lbbepool --lb-name rx-lb --resource-group lb-test --nic-name vm-1784 --ip-config-name ipconfig1

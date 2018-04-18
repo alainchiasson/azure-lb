@@ -37,7 +37,7 @@ az network lb create --resource-group $RG --name $LB
 
 # TODO: Command to create private lb :
 #
-# az network lb create -g group1 --name alch-test --subnet gvsSubnet --vnet-name gvsVnet
+# az network lb create -g group1 --name test --subnet gvsSubnet --vnet-name gvsVnet
 #
 
 # Get Backend Pool name
