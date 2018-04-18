@@ -1,0 +1,59 @@
+#!/bin/bash
+
+#
+function usage {
+  echo "Usage : "
+  echo "$0 <resource-group> <lbname> <vm-name>"
+  echo "   <resource-group> is the Azure resource-group"
+  echo "   <lbname> is the name of the LB created."
+  echo "   <vm-name> is the name of the VM to add"
+  exit 1
+}
+
+# Check for number of parameters
+if [ "$#" -ne 3 ];
+    then usage
+fi
+
+# check if azure-cli is on path
+if ! [ -x "$(command -v az)" ]; then
+  echo 'Error: Azure-CLI (az) is not installed.' >&2
+  echo 'See: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest' >&2
+  exit 1
+fi
+
+if ! [ -x "$(command -v jq)" ]; then
+  echo 'Error: JSON query (jq) is not installed.' >&2
+  echo 'See: https://stedolan.github.io/jq/' >&2
+  exit 1
+fi
+
+RG=$1
+LB=$2
+VM=$3
+
+# Todo add Checks - Validate that resource group exists
+# Todo add Checks - validate that VM exists
+# Todo add Checks - validate that load balancer exists
+
+# Get Backend Pool name
+lb_be_pool=$(az network lb show --name $LB --resource-group $RG | jq -r '.backendAddressPools[].name')
+
+# Todo add Checks - only one pool
+
+# Get list of NIC and config
+vm_nic_id=$(az vm show --name $VM --resource-group $RG | jq -r '.networkProfile.networkInterfaces[].id')
+
+# Todo add Check - only one NIC.
+
+nic_name=$(az network nic show --ids $vm_nic_id | jq -r '.name' )
+ip_config=$(az network nic show --ids $vm_nic_id | jq -r '.ipConfigurations[].name' )
+
+# Todo add Check - only on ipconfig
+
+az network nic ip-config  address-pool add \
+  --address-pool ${lb_be_pool} \
+  --lb-name $LB \
+  --resource-group $RG \
+  --nic-name ${nic_name} \
+  --ip-config-name ${ip_config}

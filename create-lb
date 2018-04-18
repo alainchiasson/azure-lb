@@ -1,0 +1,71 @@
+#!/bin/bash
+
+#
+function usage {
+  echo "Usage : "
+  echo "$0 <resource-group> <lbname-to-create>"
+  echo "   <resource-group> is the Azure resource-group."
+  echo "   <lbname-to-create> is the expected name of the LB created."
+  exit 1
+}
+
+# Check for number of parameters
+if [ "$#" -ne 2 ];
+    then usage
+fi
+
+# check if azure-cli is on path
+if ! [ -x "$(command -v az)" ]; then
+  echo 'Error: Azure-CLI (az) is not installed.' >&2
+  echo 'See: https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest' >&2
+  exit 1
+fi
+
+if ! [ -x "$(command -v jq)" ]; then
+  echo 'Error: JSON query (jq) is not installed.' >&2
+  echo 'See: https://stedolan.github.io/jq/' >&2
+  exit 1
+fi
+
+RG=$1
+LB=$2
+
+# Todo add Checks - Validate that resource group exists
+
+# Create the loadbalancer
+az network lb create --resource-group $RG --name $LB
+
+# TODO: Command to create private lb :
+#
+# az network lb create -g group1 --name alch-test --subnet gvsSubnet --vnet-name gvsVnet
+#
+
+# Get Backend Pool name
+lb_be_pool=$(az network lb show --name $LB --resource-group $RG | jq -r '.backendAddressPools[].name')
+
+# Get Public IP
+public_ip_id=$(az network lb show --name $LB --resource-group $RG | jq -r '.frontendIpConfigurations[].publicIpAddress.id')
+public_ib=$(az network public-ip show --ids `echo $public_ip_id` | jq -r '.ipAddress')
+
+
+# Define rules by port (TODO: make an associative array with rule name -or- convert to python)
+ports=( 80 3456 4040 4041 4042 4043 4044 4567 5070 5432 5678 5679 5765 8038 8081 8083 8383 8507 8705 9170 10000 18082 21000 21050 21060 21070 21080 23020 24000 25010 25020 26000 30183 30184 30186 )
+
+for port in "${ports[@]}"
+do
+# Add the rules
+
+echo "Creating rule for port $port"
+az network lb rule create  \
+  --resource-group $RG \
+  --lb-name $LB \
+  --name TCP_$port \
+  --protocol tcp \
+  --frontend-port $port \
+  --backend-port $port \
+  --backend-pool-name $lb_be_pool
+
+done
+
+# Print out result
+az network lb rule list --lb-name $LB --resource-group $RG | jq '.[] | { name: .name, port: .backendPort }'

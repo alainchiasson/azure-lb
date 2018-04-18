@@ -1,0 +1,56 @@
+---
+- name: Retrieve facts all  host
+  hosts:
+    - all
+  gather_facts: true
+  any_errors_fatal: True
+
+
+  tasks:
+  - name: create the python directory
+    file:
+      path: /root/flask_app
+      state: directory
+      mode: 0755
+
+  - name: Add requiremtns file
+    copy:
+      src: "requirements.txt"
+      dest: "/root/flask_app/requirements.txt"
+      owner: root
+      group: root
+      mode: 0655
+
+  - name: Add flask application
+    copy:
+      src: "app.py"
+      dest: "/root/flask_app/app.py"
+      owner: root
+      group: root
+      mode: 0755
+
+  - name: Create flask service
+    copy:
+      src: "flask_app.service"
+      dest: "/lib/systemd/system/flask_app.service"
+      owner: root
+      group: root
+      mode: 0755
+
+  - name: install python and pip
+    package:
+      name: "{{ item }}"
+      state: installed
+    with_items:
+      - python-virtualenv
+      - python-pip
+
+  - name: run pip requrirements
+    pip:
+      requirements: requirements.txt
+      chdir: /root/flask_app
+
+  - name: run flask site
+    service:
+      name: flask_app
+      state: started
